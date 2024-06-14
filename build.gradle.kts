@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "gg.essential"
-version = "0.6.0"
+version = "0.6.0+diamond.neofix"
 
 java.withSourcesJar()
 
@@ -45,6 +45,19 @@ publishing {
                     password = nexusPassword.toString()
                 }
             }
+        }
+
+        maven {
+            name = "diamond"
+
+            url = uri("https://maven.dediamondpro.dev/releases")
+
+            credentials {
+                username = System.getenv("MAVEN_DIAMOND_USER")
+                password = System.getenv("MAVEN_DIAMOND_PASSWORD")
+            }
+
+            version = project.version
         }
     }
 }
