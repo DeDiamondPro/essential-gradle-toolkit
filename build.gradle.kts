@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "gg.essential"
-version = "0.6.2+diamond.loom1.6.20"
+version = "0.6.2+diamond.loom1.6.17"
 
 java.withSourcesJar()
 
