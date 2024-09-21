@@ -9,7 +9,6 @@ import org.gradle.api.Project
 import org.gradle.api.plugins.BasePluginExtension
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.jvm.toolchain.JavaLanguageVersion
-import org.gradle.jvm.toolchain.JavaToolchainSpec
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -59,7 +58,7 @@ fun configureJavaVersion() {
     pluginManager.withPlugin("kotlin") {
         configure<KotlinJvmProjectExtension> {
             jvmToolchain {
-                (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(platform.javaVersion.majorVersion))
+                languageVersion.set(JavaLanguageVersion.of(platform.javaVersion.majorVersion))
             }
         }
 
@@ -88,13 +87,14 @@ fun configureResources() {
         // TODO is this required? are the FileCopyDetails not part of the input already?
         inputs.property("mod_version_expansions", expansions)
 
-        filesMatching(listOf("mcmod.info", "META-INF/mods.toml", "fabric.mod.json")) {
+        filesMatching(listOf("mcmod.info", "META-INF/mods.toml", "META-INF/neoforge.mods.toml", "fabric.mod.json")) {
             expand(expansions)
         }
 
         // And exclude mod metadata files for other platforms
         if (!platform.isFabric) exclude("fabric.mod.json")
         if (!platform.isModLauncher) exclude("META-INF/mods.toml")
+        if (!platform.isNeoForge) exclude("META-INF/neoforge.mods.toml")
         if (!platform.isLegacyForge) exclude("mcmod.info")
     }
 }
@@ -114,12 +114,14 @@ fun inheritConfigurationFrom(parent: Project) {
     }
 
     afterEvaluate {
-        tasks.withType<KotlinCompile> {
-            kotlinOptions {
-                if (moduleName == null && "-module-name" !in freeCompilerArgs) {
-                    moduleName = project.findProperty("baseArtifactId")?.toString()
-                            ?: parentBase?.archivesName?.orNull
-                            ?: parent.name.toLowerCase()
+        pluginManager.withPlugin("kotlin") {
+            tasks.withType<KotlinCompile> {
+                kotlinOptions {
+                    if (moduleName == null && "-module-name" !in freeCompilerArgs) {
+                        moduleName = project.findProperty("baseArtifactId")?.toString()
+                                ?: parentBase?.archivesName?.orNull
+                                ?: parent.name.lowercase()
+                    }
                 }
             }
         }

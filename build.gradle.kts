@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "gg.essential"
-version = "0.6.0+diamond.neofix"
+version = "0.6.2+diamond.neofix"
 
 java.withSourcesJar()
 
